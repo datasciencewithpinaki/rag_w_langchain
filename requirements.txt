@@ -1,0 +1,31 @@
+# env: cs-genai-langchain
+
+matplotlib
+nltk
+numpy
+pandas
+plotly
+pyparsing
+regex
+tqdm
+sentence-transformers
+
+python-dotenv
+openai==1.12.0
+langchain
+langchain-community
+langchain-core
+
+
+# -- for wmt api end point, certificate, etc.
+urllib3==2.0.7
+pycryptodome==3.19.1
+
+
+# -- for evaluation metric
+evaluate
+rouge-score
+bert_score
+
+# embedding
+sentence-transformers
