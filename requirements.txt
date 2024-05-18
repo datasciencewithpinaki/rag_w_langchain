@@ -29,3 +29,6 @@ bert_score
 
 # embedding
 sentence-transformers
+
+# vector db
+chromadb
