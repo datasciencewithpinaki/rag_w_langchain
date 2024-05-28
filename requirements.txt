@@ -1,4 +1,4 @@
-# env: cs-genai-langchain
+# env: suppbot-langchain
 
 matplotlib
 nltk
@@ -8,14 +8,14 @@ plotly
 pyparsing
 regex
 tqdm
-sentence-transformers
 
 python-dotenv
 openai==1.12.0
 langchain
 langchain-community
+langchain-experimental
 langchain-core
-
+langchainhub
 
 # -- for wmt api end point, certificate, etc.
 urllib3==2.0.7
@@ -27,8 +27,15 @@ evaluate
 rouge-score
 bert_score
 
-# embedding
+# -- embedding
+# not required if using langchain based ST
 sentence-transformers
+# required for testing splitting / chunking strategies
+# spacy
 
-# vector db
+# load documents
+docx2txt
+pypdf
+
+# vector databases
 chromadb
