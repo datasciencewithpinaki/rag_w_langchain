@@ -14,9 +14,11 @@ class RetrieveDocs:
             kwargs <dict>: includes a filter based on metadata
         '''
         docs_retrieved = RetrieveDocs.retrieve_docs(query, vector_store, method_search, **kwargs)
-        print("docs_retrieved:\n")
-        RetrieveDocs.pprint_docs(docs_retrieved)
-        docs_reranked = RetrieveDocs.rerank_docs(query, docs_retrieved, method_rerank)
+        if method_search in ['mmr']:  # re-ranking is inherent in these            
+            docs_reranked = docs_retrieved[:]
+            print(f'No re-ranking required. `{method_search}` already incorporates re-ranking.')
+        else:  # explicit re-ranking is required
+            docs_reranked = RetrieveDocs.rerank_docs(query, docs_retrieved, method_rerank)
         return docs_reranked
 
     def retrieve_docs(query:str, vector_store:Chroma, method:str='mmr', **kwargs)->list[Document]:
@@ -59,6 +61,8 @@ class RetrieveDocs:
         methods = ['pass', 'simple', 'multi-model']
         if method not in methods:
             print(f'method is incorrect. method needs to be out of {methods}')
+            docs_reranked = docs[:]
+        elif method=='pass':
             docs_reranked = docs[:]
         elif method=='simple':  # Example: [1,2,3,4,5,6] --> [1,3,5] + [6,4,2]
             docs_even = [doc for idx, doc in enumerate(docs) if idx%2==0]
