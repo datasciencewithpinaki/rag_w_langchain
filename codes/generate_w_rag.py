@@ -4,9 +4,34 @@ from langchain_community.vectorstores.chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
+from langchain.llms.openai import OpenAI
+from langchain_community.chat_models import ChatOpenAI
 
-from codes.llm_gateway import openAI_wo_api
 from codes.retrieve_docs import ReRanking, EmbeddingSimilarity
+
+
+class LlmCall:
+    
+    def call_llm(model:str='gpt-4'):
+        '''
+        return llm object based on model chosen
+        Arguments:
+            model_name <str>: choose name from ["gpt-3.5-turbo-instruct", "gpt-3.5-turbo-1106", "gpt-4", "gpt-4o"]
+        '''
+        models_approved = ["gpt-3.5-turbo-instruct", "gpt-3.5-turbo-1106", "gpt-4", "gpt-4o"]
+        if model not in models_approved:
+            print(f'Choose model from: {models_approved}')
+            raise NotImplementedError
+        elif model == "gpt-3.5-turbo-instruct":
+            llm = OpenAI(model_name=model, temperature=0.)
+        elif model == "gpt-3.5-turbo-1106":
+            llm = ChatOpenAI(model_name=model, temperature=0.)
+        elif model == "gpt-4":
+            llm = ChatOpenAI(model_name=model, temperature=0.)
+        elif model == "gpt-4o":
+            llm = ChatOpenAI(model_name=model, temperature=0.)
+        return llm
+
 
 class LlmWithManualRag:
     '''
@@ -14,19 +39,22 @@ class LlmWithManualRag:
     If retriever is None, LLM is invoked without using retrieved documents
     '''
 
-    def invoke_chain(prompt_upd:str):
+    def invoke_chain(prompt_upd:str, model_name:str='gpt-4'):
         '''
         Get response from LLM by passing the prompt. 
         This may include the retrieved documents if `add_context_to_prompt()` method is called earlier.
+        Arguments:
+            model_name <str>: choose name from ["gpt-3.5-turbo-instruct", "gpt-3.5-turbo-1106", "gpt-4", "gpt-4o"]
         '''
-        model = openAI_wo_api()
+        model = LlmCall.call_llm(model_name)
         response = model.invoke(prompt_upd)
         return response
     
     def add_context_to_prompt(query:str, 
                               docs_retrieved:List[Document], 
                               rerank:bool=False, 
-                              rerank_method:str='pass'):
+                              rerank_method:str='pass', 
+                              model_name:str='gpt-4'):
         '''
         Add context to the query and this would be the prompt for generation later.
         prompt_upd = context + query
@@ -37,7 +65,7 @@ class LlmWithManualRag:
             rerank <bool>: True if reranking is required
             rerank_method <str>: choose one out of ['pass', 'simple']; Is ignored if rerank is False
         '''
-        model = openAI_wo_api()
+        model = LlmCall.call_llm(model_name)
 
         docs_retrieved_upd = docs_retrieved if not rerank else LlmWithManualRag.rerank_docs(docs_retrieved, rerank_method)
         
@@ -102,11 +130,14 @@ class LlmWithManualRag:
 
 class LlmWithRag:
     
-    def create_chain(retriever:List[Document], rerank:bool=False, rerank_method:str=None):
+    def create_chain(retriever:List[Document], 
+                     rerank:bool=False, 
+                     rerank_method:str=None, 
+                     model_name:str='gpt-4'):
         '''
         Create an LLM Chain that includes retrieved documents
         '''
-        model = openAI_wo_api()
+        model = LlmCall.call_llm(model_name)
         
         system_prompt = ("""
         Answer the question based only on the context provided. 
