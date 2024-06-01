@@ -39,3 +39,6 @@ pypdf
 
 # vector databases
 chromadb
+
+# reranking
+flashrank
