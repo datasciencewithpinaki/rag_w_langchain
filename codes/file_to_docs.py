@@ -157,16 +157,16 @@ class Docs2VectorDb:
         )
         return vector_store
 
-    def sources_from_vdb(vector_store:Chroma):
+    def sources_from_vdb(vector_store:Chroma, metadata_key:str='source'):
         docs = vector_store.get()['metadatas']
         metadata_sources = {}
-        metadata_sources['source'] = []
+        metadata_sources[metadata_key] = []
         for doc in docs:
             for k,v in doc.items():
-                if k!='source':
+                if k!=metadata_key:
                     continue
                 metadata_sources[k].append(v)
-        metadata_sources['source'] = {v for v in metadata_sources['source']}
+        metadata_sources[metadata_key] = {v for v in metadata_sources[metadata_key]}
         return metadata_sources
         
 
